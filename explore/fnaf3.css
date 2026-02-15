@@ -32,20 +32,22 @@ body {
     100% { opacity: 1; }
 }
 
-/* Scanlines */
+/* Scanlines + Vignette Combined */
 
 body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    background: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.03) 0px,
-        rgba(255,255,255,0.03) 1px,
-        transparent 1px,
-        transparent 3px
-    );
+    background:
+        radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.6) 100%),
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.03) 0px,
+            rgba(255,255,255,0.03) 1px,
+            transparent 1px,
+            transparent 3px
+        );
 }
 
 /* Moving distortion lines */
@@ -88,34 +90,30 @@ body::before {
 
 .intro-text {
     position: relative;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     letter-spacing: 4px;
     opacity: 0;
     transform: scale(0.85);
     color: #9ccc3c;
     animation:
         introAppear 2.5s forwards,
-        redGlow 1s forwards 3s;
+        redGlow 1s forwards 3s,
+        constantGrow 6s linear forwards,
+        glitchFX 2.5s infinite;
 }
 
-/* fade + grow */
 @keyframes introAppear {
-    0% {
-        opacity: 0;
-        transform: scale(0.85);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
+    0% { opacity: 0; transform: scale(0.85); }
+    100% { opacity: 1; transform: scale(0.95); }
 }
 
-/* red takeover */
+@keyframes constantGrow {
+    0% { transform: scale(0.95); }
+    100% { transform: scale(1.3); }
+}
+
 @keyframes redGlow {
-    0% {
-        color: #9ccc3c;
-        text-shadow: none;
-    }
+    0% { color: #9ccc3c; text-shadow: none; }
     100% {
         color: #ff0000;
         text-shadow:
@@ -125,23 +123,12 @@ body::before {
     }
 }
 
-/* glitch layer */
-.glitch-layer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    color: red;
-    opacity: 0.3;
-    animation: glitch 0.2s infinite;
-}
-
-@keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 1px); }
-    40% { transform: translate(2px, -1px); }
-    60% { transform: translate(-1px, 2px); }
-    80% { transform: translate(1px, -2px); }
-    100% { transform: translate(0); }
+@keyframes glitchFX {
+    0%, 100% { filter: none; }
+    20% { filter: brightness(140%) contrast(180%); }
+    21% { filter: brightness(40%) contrast(200%); }
+    22% { filter: brightness(120%) contrast(150%); }
+    50% { filter: none; }
 }
 
 .fade-out {
@@ -161,7 +148,6 @@ body::before {
 .fade-in {
     opacity: 1;
 }
-
 
 /* =========================
    HEADER
@@ -183,9 +169,10 @@ body::before {
 ========================= */
 
 .glitch-title {
+    margin-bottom: 6px;
     position: relative;
-    font-size: 3.6rem;
-    letter-spacing: 6px;
+    font-size: 3.8rem;
+    letter-spacing: 8px;
     color: #9ccc3c;
     text-shadow:
         0 0 8px rgba(140,255,60,0.6),
@@ -193,32 +180,29 @@ body::before {
         0 0 40px rgba(80,200,30,0.2);
     animation:
         titleFlicker 4s infinite,
-        titleGlitch 6s infinite;
+        titleGlitch 6s infinite,
+        titleDistort 8s infinite;
 }
 
-/* light instability flicker */
 @keyframes titleFlicker {
     0%, 100% { opacity: 1; }
-    96% { opacity: 0.85; }
+    94% { opacity: 0.85; }
+    95% { opacity: 1; }
+    96% { opacity: 0.5; }
     97% { opacity: 1; }
-    98% { opacity: 0.6; }
-    99% { opacity: 1; }
 }
 
-/* occasional distortion jump */
 @keyframes titleGlitch {
-    0%, 90%, 100% {
-        transform: translate(0);
-    }
-    92% {
-        transform: translate(-2px, 1px);
-    }
-    94% {
-        transform: translate(2px, -1px);
-    }
-    96% {
-        transform: translate(-1px, -2px);
-    }
+    0%, 90%, 100% { transform: translate(0); }
+    92% { transform: translate(-2px, 1px); }
+    94% { transform: translate(2px, -1px); }
+}
+
+@keyframes titleDistort {
+    0%, 100% { filter: none; }
+    40% { filter: brightness(120%) contrast(140%); }
+    41% { filter: brightness(50%) contrast(200%); }
+    42% { filter: none; }
 }
 
 /* =========================
@@ -226,12 +210,26 @@ body::before {
 ========================= */
 
 .subtitle {
-    margin-top: 12px;
-    font-size: 1rem;
-    letter-spacing: 4px;
-    color: rgba(200,255,120,0.8);
-    text-shadow: 0 0 12px rgba(150,255,80,0.4);
+    margin-top: 4px;
+    font-size: 1.05rem;
+    letter-spacing: 6px;
+    color: #b6d96a;
+    position: relative;
+    display: inline-block;
+    text-shadow:
+        0 0 6px rgba(140,255,60,0.4),
+        0 0 15px rgba(100,200,50,0.25);
+    animation: subtitleFlicker 7s infinite;
 }
+
+@keyframes subtitleFlicker {
+    0%, 100% { opacity: 1; }
+    93% { opacity: 0.7; }
+    94% { opacity: 1; }
+    95% { opacity: 0.4; }
+    96% { opacity: 1; }
+}
+
 
 /* =========================
    CONTENT
@@ -247,6 +245,24 @@ body::before {
     margin-bottom: 60px;
     background: rgba(10,10,5,0.95);
     border: 1px solid rgba(120,150,40,0.3);
+    animation: boxFlicker 6s infinite;
+}
+
+/* WELCOME TITLE UPGRADE */
+
+.intro-box h2 {
+    font-size: 2.2rem;
+    letter-spacing: 6px;
+    color: #9ccc3c;
+    text-shadow:
+        0 0 10px rgba(140,255,60,0.5),
+        0 0 25px rgba(100,200,50,0.3);
+    animation: attractionPulse 5s infinite;
+}
+
+@keyframes attractionPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
 }
 
 .grid {
@@ -259,23 +275,37 @@ body::before {
     padding: 30px;
     background: rgba(12,12,8,0.95);
     border: 1px solid rgba(120,150,40,0.3);
+    animation: boxFlicker 6s infinite;
 }
 
+/* ABOUT THE GAME UPGRADE */
+
 .description h3 {
-    letter-spacing: 3px;
-    margin-bottom: 15px;
+    font-size: 1.3rem;
+    letter-spacing: 5px;
+    color: #9cc54b;
+    text-shadow:
+        0 0 8px rgba(140,255,60,0.4),
+        0 0 18px rgba(120,200,50,0.2);
+    margin-bottom: 20px;
 }
 
 .description p {
-    line-height: 1.7;
-    color: #d6ff8a;
+    font-size: 1.08rem;   
+    line-height: 1.85;
+    letter-spacing: 1px;
+    color: #b6d96a;
+    text-shadow:
+        0 0 6px rgba(140,255,60,0.25);
 }
 
-/* VIDEO FIXED */
+
+/* VIDEO */
 
 .video-preview {
     border: 1px solid rgba(120,150,40,0.3);
     background: #000;
+    animation: boxFlicker 6s infinite;
 }
 
 .video-preview video {
@@ -294,3 +324,4 @@ body::before {
     0% { filter: brightness(0.85) contrast(1.3) saturate(0.6) hue-rotate(15deg); }
     100% { filter: brightness(0.9) contrast(1.4) saturate(0.5) hue-rotate(20deg); }
 }
+
